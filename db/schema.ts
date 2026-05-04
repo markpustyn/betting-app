@@ -24,7 +24,7 @@ export const bets = pgTable("bets", {
   totalPool: numeric("total_pool").default("0"),
   winner: text("winner"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  closesAt: timestamp("closes_at"),
+  closesAt: timestamp("closes_at").notNull(),
 })
 
 export const trades = pgTable("trades", {

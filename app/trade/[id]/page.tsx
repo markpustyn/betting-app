@@ -1,5 +1,5 @@
 import Header from "@/components/header"
-import Chart from "../chart"
+import Chart from "./chart"
 import Orders from "../orders"
 import { db } from "@/db/db"
 import { bets } from "@/db/schema"
@@ -21,7 +21,6 @@ const data = await db.select().from(bets).where(eq(bets.id, Number(id)))
 if(!data || data.length === 0) {
   return <div>No bets available</div>
 }
-
 const data2 = data[0]
 
   
@@ -34,7 +33,7 @@ const data2 = data[0]
           
           {/* Chart */}
           <div className="w-full md:w-3/4">
-            <Chart />
+            <Chart id={id}/>
             <Info
             category="Sports"
             volume={Number(data2.totalPool)}

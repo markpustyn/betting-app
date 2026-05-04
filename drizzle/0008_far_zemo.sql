@@ -1,0 +1,1 @@
+ALTER TABLE "bets" ALTER COLUMN "closes_at" SET NOT NULL;

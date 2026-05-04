@@ -33,7 +33,9 @@ export default async function Home() {
 
                   <CardContent>
                     <p className="text-sm text-muted-foreground">
-                      {market.createdAt.toDateString()}
+                        <strong>Ends On: </strong>{market.closesAt
+                ? new Date(market.closesAt).toDateString()
+                : "No closing date"}
                     </p>
                     <MarketMiniChart
                       betId={market.id}
