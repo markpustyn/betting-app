@@ -6,9 +6,18 @@ import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 import { Bet } from '@/db/types'
 import { toast } from 'sonner'
+import { ethers } from 'ethers'
+import { CONTRACT_ABI, CONTRACT_ADDRESS } from '@/lib/contract'
 
 type OrdersProps = {
   data: Bet
+}
+
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ethereum: any 
+  }
 }
 
 function Orders({ data }: OrdersProps) {
@@ -17,46 +26,67 @@ function Orders({ data }: OrdersProps) {
   const [loading, setLoading] = useState(false)
 
   async function handleTrade() {
-  if (!active || !amount) return
+    if (!active || !amount) return
 
-  setLoading(true)
+    setLoading(true)
 
-  try {
-    const accounts = await window.ethereum.request({
-      method: 'eth_requestAccounts',
-    })
+    try {
+      if (!window.ethereum) {
+        throw new Error('MetaMask not found')
+      }
 
-    const address = accounts[0]
+      const provider = new ethers.BrowserProvider(window.ethereum)
 
-    const res = await fetch('/api/trade', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        side: active,
-        amount: Number(amount),
-        betId: data.id,
-        address: address,
-      }),
-    })
+      await provider.send('eth_requestAccounts', [])
 
-    if (!res.ok) {
-      throw new Error('Failed to place trade')
+      const signer = await provider.getSigner()
+      const address = await signer.getAddress()
+
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        signer
+      )
+
+      const option = active === data.optionA ? 1 : 2
+
+      const tx = await contract.placeBet(data.id, option, {
+        value: ethers.parseEther(amount),
+      })
+
+      await tx.wait()
+
+      const res = await fetch('/api/trade', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          side: active,
+          amount,
+          betId: data.id,
+          address,
+          txHash: tx.hash,
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to save trade')
+      }
+
+      setAmount('')
+      setActive(null)
+
+      toast.success('Trade placed successfully', {
+        position: 'top-center',
+      })
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to place trade')
+    } finally {
+      setLoading(false)
     }
-
-    setAmount('')
-    setActive(null)
-
-    toast.success('Trade placed successfully', {
-      position: 'top-center',
-    })
-  } catch {
-    toast.error('Failed to place trade')
-  } finally {
-    setLoading(false)
   }
-}
 
   return (
     <div className="w-full pt-16">
@@ -93,7 +123,7 @@ function Orders({ data }: OrdersProps) {
           <div className="pt-4">
             <Input
               type="number"
-              placeholder="$0"
+              placeholder="0.01 ETH"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />

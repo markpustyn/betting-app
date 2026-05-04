@@ -49,7 +49,7 @@ function History({ betId }: { betId: number }) {
               <TableCell>{formatAddress(trade.userId)}</TableCell>
               <TableCell>{trade.side}</TableCell>
               <TableCell className="text-right">
-                ${Number(trade.amount).toFixed(2)}
+                {Number(trade.amount).toFixed(2)} ETH
               </TableCell>
             </TableRow>
           ))}

@@ -29,7 +29,7 @@ export const bets = pgTable("bets", {
 
 export const trades = pgTable("trades", {
   id: serial("id").primaryKey(),
-
+  txHash: text("tx_hash"),
   userId: text("user_id"),
   betId: integer("bet_id")
     .references(() => bets.id)

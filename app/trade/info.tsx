@@ -23,7 +23,7 @@ function Info({ category, volume, closes}: InfoProps) {
 
           <div className="text-muted-foreground">Volume</div>
           <div className="text-right font-medium">
-            ${volume.toLocaleString()}
+            {volume.toLocaleString()} ETH
           </div>
           <div className="text-muted-foreground">Closes</div>
           <div className="text-right font-medium">

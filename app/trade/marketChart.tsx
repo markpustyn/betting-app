@@ -1,7 +1,7 @@
 "use client"
 
-import useSWR from "swr"
 import toTrade, { generateBettingChart } from "@/lib/algorithm"
+import useSWR from "swr"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -19,8 +19,6 @@ export default function MarketMiniChart({ betId, betNames }: Props) {
   if (isLoading) {
     return <div className="mt-4 h-3 w-full rounded-full bg-zinc-200" />
   }
-
-
 
    const chartData = generateBettingChart(data.data.map(toTrade), betNames)
   

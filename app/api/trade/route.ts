@@ -6,9 +6,9 @@ export async function POST(req: Request) {
   
   try {
 
-    const { side, amount, betId, address } = await req.json()
+    const { side, amount, betId, address, txHash } = await req.json()
 
-    if (!side || !amount || !betId) {
+    if (!side || !amount || !betId || !address || !txHash) {
       return NextResponse.json(
         { error: "Missing fields" },
         { status: 400 }
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
         betId: Number(betId),
         side,
         amount: String(amount),
+        txHash: String(txHash),
       })
       .returning()
 
