@@ -50,8 +50,6 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function ChartAreaInteractive({ chartData, betNames }: { chartData: ChartPoint[]; betNames: [string, string] }) {
-  const [timeRange, setTimeRange] = React.useState("90d")
-
 const filteredData = chartData.slice(-50)
 
   return (

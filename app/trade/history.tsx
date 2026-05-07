@@ -10,21 +10,42 @@ import {
 } from "@/components/ui/table"
 
 import useSWR from "swr"
-import { Trade } from "@/db/types"
+import { Trade, Bet } from "@/db/types"
 import { formatAddress } from "@/lib/tools"
+import { calculatePayout } from "@/lib/algorithm"
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
-function History({ betId }: { betId: number }) {
-  const { data, isLoading } = useSWR(
-    `/api/history?betId=${betId}`,
-    fetcher,
-    {
-      refreshInterval: 5000,
-    }
-  )
+function History({
+  bet,
+  optionAPool,
+  optionBPool,
+}: {
+  bet: Bet
+  optionAPool: number
+  optionBPool: number
+}) {
+  const { data, isLoading } = useSWR(`/api/history?betId=${bet.id}`, fetcher, {
+    refreshInterval: 5000,
+  })
 
   const trades: Trade[] = data?.data ?? []
+  const currentTotalPool = Number(data?.totalPool ?? bet.totalPool ?? 0)
+
+  function getPayout(trade: Trade) {
+    const tradeAmount = Number(trade.amount || 0)
+
+    const selectedSidePool =
+      trade.side === bet.optionA
+        ? Number(optionAPool || 0)
+        : Number(optionBPool || 0)
+
+    return calculatePayout({
+      userBetAmount: tradeAmount,
+      winningPool: selectedSidePool,
+      totalPool: currentTotalPool,
+    })
+  }
 
   if (isLoading) {
     return <p className="text-sm text-muted-foreground mt-4">Loading history...</p>
@@ -39,6 +60,7 @@ function History({ betId }: { betId: number }) {
           <TableRow>
             <TableHead>User</TableHead>
             <TableHead>Trade</TableHead>
+            <TableHead>Est Payout</TableHead>
             <TableHead className="text-right">Amount</TableHead>
           </TableRow>
         </TableHeader>
@@ -48,6 +70,7 @@ function History({ betId }: { betId: number }) {
             <TableRow key={trade.id}>
               <TableCell>{formatAddress(trade.userId)}</TableCell>
               <TableCell>{trade.side}</TableCell>
+              <TableCell>{getPayout(trade)} ETH</TableCell>
               <TableCell className="text-right">
                 {Number(trade.amount).toFixed(2)} ETH
               </TableCell>
@@ -56,7 +79,10 @@ function History({ betId }: { betId: number }) {
 
           {trades.length === 0 && (
             <TableRow>
-              <TableCell colSpan={3} className="text-center text-sm text-muted-foreground">
+              <TableCell
+                colSpan={4}
+                className="text-center text-sm text-muted-foreground"
+              >
                 No trades yet
               </TableCell>
             </TableRow>

@@ -14,6 +14,7 @@ export type Bet = {
   totalPool: string | null
   winner: string | null
   createdAt: Date
+  closesAt: Date
 }
 
 
@@ -24,4 +25,5 @@ export type Trade = {
   side: string
   amount: number
   createdAt: Date
+  txHash: string
 }

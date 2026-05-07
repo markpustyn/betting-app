@@ -7,7 +7,7 @@ type ChartPoint = {
 }
 
 const HOUSE_EDGE = 0.08
-const START_LIQUIDITY = 1000
+const START_LIQUIDITY = 60
 const START_YES_PROBABILITY = 0.5
 const BUCKET_SECONDS = 30
 
@@ -79,13 +79,13 @@ export function calculatePayout({
   userBetAmount: number
   winningPool: number
   totalPool: number
-}) {
-  const HOUSE_EDGE = 0.08
+}): number {
+  if (winningPool <= 0 || userBetAmount <= 0) return 0
 
-  if (winningPool <= 0) return 0
-
-  const payoutPool = totalPool * (1 - HOUSE_EDGE)
   const userShare = userBetAmount / winningPool
 
-  return Number((payoutPool * userShare).toFixed(2))
+  const losingPool = totalPool - winningPool
+  const payout = userBetAmount + losingPool * userShare
+
+  return Number(payout.toFixed(2))
 }

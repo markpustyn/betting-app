@@ -2,9 +2,9 @@ import Header from "@/components/header"
 import Chart from "./chart"
 import Orders from "../orders"
 import { db } from "@/db/db"
-import { bets } from "@/db/schema"
+import { bets, trades } from "@/db/schema"
 import History from "../history"
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 import Info from "../info"
 
 
@@ -23,6 +23,32 @@ if(!data || data.length === 0) {
 }
 const data2 = data[0]
 
+
+const optionAPool = await db
+  .select()
+  .from(trades)
+  .where(
+    and(
+      eq(trades.betId, Number(id)),
+      eq(trades.side, data2.optionA)
+    )
+  )
+  .then((res) =>
+    res.reduce((sum, trade) => sum + Number(trade.amount), 0)
+  )
+
+const optionBPool = await db
+  .select()
+  .from(trades)
+  .where(
+    and(
+      eq(trades.betId, Number(id)),
+      eq(trades.side, data2.optionB)
+    )
+  )
+  .then((res) =>
+    res.reduce((sum, trade) => sum + Number(trade.amount), 0)
+  )
   
   return (
     <div>
@@ -43,9 +69,9 @@ const data2 = data[0]
 
           {/* Orders */}
           <div className="w-full md:w-1/4">
-            <Orders data={data2} />
+            <Orders data={data2} optionAPool={optionAPool} optionBPool={optionBPool}/>
             
-            <History betId={data2.id}/>
+            <History bet={data2} optionAPool={optionAPool} optionBPool={optionBPool}/>
           </div>
 
         </div>

@@ -121,8 +121,8 @@ function Page() {
          
         </div>
         <div className="pt-12">
- <History/>
  </div>
+         <History />
         
       </main>
     </div>

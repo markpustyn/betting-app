@@ -27,6 +27,9 @@ export default function Header() {
         </Link>
 
       <div className="flex gap-4 px-6">
+        <MetaMaskProvider debug={false} sdkOptions={sdkOptions}>
+        <ConnectWalletButton />
+        </MetaMaskProvider>
         <Link href={'/account'}>
         <Button>
           Account
