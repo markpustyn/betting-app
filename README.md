@@ -309,6 +309,11 @@ Only the contract owner can:
 
 ---
 
+<img width="960" height="257" alt="CSC146 BlockBet Presentation (4)" src="https://github.com/user-attachments/assets/011a85d9-abe0-4b1a-89e2-c15aab485257" />
+
+
+
+
 # Challenges
 
 Several technical challenges were encountered during development.
